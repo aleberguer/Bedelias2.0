@@ -1,8 +1,9 @@
 from django.contrib import admin
-from .models import Carrera, Usuario, Curso, Grupo, GrupoCurso, UsuarioCurso
+from .models import Carrera, Usuario, Curso, Grupo, GrupoCurso, UsuarioCurso, Facultad
 
 admin.site.register(Carrera)
 admin.site.register(Curso)
+admin.site.register(Facultad)
 
 
 class GrupoCursoInline(admin.TabularInline):

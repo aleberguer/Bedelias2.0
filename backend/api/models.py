@@ -3,12 +3,21 @@ from django.contrib.auth.models import User
 # SIGNALS AND LISTENERS
 from django.db.models.signals import post_save
 from django.dispatch import receiver
+from django.utils.encoding import smart_unicode
+
 
 class Carrera(models.Model):
-    nombre = models.CharField(max_length=200)
+    nombre = models.CharField(max_length=200, blank=True, null=True)
     codigo = models.CharField(max_length=20, primary_key=True)
     plan = models.CharField(max_length=200, blank=True, null=True)
+    facultad = models.ForeignKey('Facultad', related_name="carreras", blank=True, null=True)
 
+    def __str__(self): 
+        return self.nombre
+
+class Facultad(models.Model):
+    nombre = models.CharField(max_length=200)
+    
     def __str__(self): 
         return self.nombre
 
@@ -25,17 +34,21 @@ class Curso(models.Model):
         ('curso', 'Curso'),
         ('examen', 'Examen'),
     )
-    codigo = models.CharField(max_length=20, primary_key=True)
+    codigo = models.CharField(max_length=20)
     nombre = models.CharField(max_length=200)
-    aprobacion = models.CharField(max_length=200, choices=APROBACION_CHOICES)
-    validez = models.IntegerField()
-    creditos = models.IntegerField()
+    aprobacion = models.CharField(max_length=200, choices=APROBACION_CHOICES,null=True, blank=True)
+    validez = models.IntegerField(null=True, blank=True)
+    creditos = models.IntegerField(null=True, blank=True)
     previas_grupo = models.ManyToManyField('Grupo', blank=True)
     previas_curso = models.ManyToManyField('self', blank=True)
     antiprevias = models.ManyToManyField('self', blank=True)
+    carrera = models.ForeignKey('Carrera', null=True, blank=True)
 
-    def __str__(self):
-        return self.codigo + " - " + self.nombre
+    class Meta: 
+        unique_together = ("codigo", "carrera")
+
+    def __unicode__(self): 
+        return smart_unicode(self.codigo + " - " + self.nombre)
 
 
 class Grupo(models.Model):
