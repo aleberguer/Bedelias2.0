@@ -12,7 +12,7 @@ class Carrera(models.Model):
     plan = models.CharField(max_length=200, blank=True, null=True)
     facultad = models.ForeignKey('Facultad', related_name="carreras", blank=True, null=True)
 
-    def __str__(self): 
+    def __unicode__(self): 
         return self.nombre
 
 class Facultad(models.Model):
@@ -48,7 +48,7 @@ class Curso(models.Model):
         unique_together = ("codigo", "carrera")
 
     def __unicode__(self): 
-        return smart_unicode(self.codigo + " - " + self.nombre)
+        return self.codigo + " - " + self.nombre
 
 
 class Grupo(models.Model):
