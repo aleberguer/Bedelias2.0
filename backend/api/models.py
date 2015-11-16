@@ -8,9 +8,12 @@ from django.utils.encoding import smart_unicode
 
 class Carrera(models.Model):
     nombre = models.CharField(max_length=200, blank=True, null=True)
-    codigo = models.CharField(max_length=20, primary_key=True)
+    codigo = models.CharField(max_length=20)
     plan = models.CharField(max_length=200, blank=True, null=True)
     facultad = models.ForeignKey('Facultad', related_name="carreras", blank=True, null=True)
+
+    class Meta: 
+        unique_together = ("codigo", "facultad")
 
     def __unicode__(self): 
         return self.nombre
@@ -18,7 +21,7 @@ class Carrera(models.Model):
 class Facultad(models.Model):
     nombre = models.CharField(max_length=200)
     
-    def __str__(self): 
+    def __unicode__(self): 
         return self.nombre
 
 class Usuario(models.Model):  
@@ -26,7 +29,7 @@ class Usuario(models.Model):
     carrera = models.ForeignKey('Carrera', null=True, blank=True)
     cursos = models.ManyToManyField('Curso', through='UsuarioCurso')
 
-    def __str__(self): 
+    def __unicode__(self): 
         return self.user.username
 
 class Curso(models.Model):
@@ -39,13 +42,21 @@ class Curso(models.Model):
     aprobacion = models.CharField(max_length=200, choices=APROBACION_CHOICES,null=True, blank=True)
     validez = models.IntegerField(null=True, blank=True)
     creditos = models.IntegerField(null=True, blank=True)
-    previas_grupo = models.ManyToManyField('Grupo', blank=True)
-    previas_curso = models.ManyToManyField('self', blank=True)
-    antiprevias = models.ManyToManyField('self', blank=True)
+    previas_curso_tipoGrupo = models.ManyToManyField('Grupo', blank=True)
+    previas_curso_tipoCurso = models.ManyToManyField('self', blank=True)
+    antiprevias_curso_tipoGrupo = models.ManyToManyField('Grupo', blank=True, related_name="anti_cursos")
+    antiprevias_curso_tipoCurso = models.ManyToManyField('self', blank=True)
+
+    previas_examen_tipoGrupo = models.ManyToManyField('Grupo', blank=True, related_name="examenes_curso")
+    previas_examen_tipoCurso = models.ManyToManyField('self', blank=True, related_name="examenes_grupo")
+    antiprevias_examen_tipoGrupo = models.ManyToManyField('Grupo', blank=True, related_name="anti_examenes")
+    antiprevias_examen_tipoCurso = models.ManyToManyField('self', blank=True)
+
     carrera = models.ForeignKey('Carrera', null=True, blank=True)
+    facultad = models.ForeignKey('Facultad', null=True, blank=True)
 
     class Meta: 
-        unique_together = ("codigo", "carrera")
+        unique_together = ("codigo", "carrera", "facultad")
 
     def __unicode__(self): 
         return self.codigo + " - " + self.nombre
@@ -53,16 +64,27 @@ class Curso(models.Model):
 
 class Grupo(models.Model):
     nombre = models.CharField(max_length=128)
+    codigo = models.CharField(max_length=128)
+    facultad = models.ForeignKey('Facultad', null=True, blank=True)
     puntaje_minimo = models.IntegerField()
     puntaje_maximo = models.IntegerField()
-    cursos = models.ManyToManyField(Curso, through='GrupoCurso')
+    cursos = models.ManyToManyField(Curso, through='GrupoCurso', blank=True)
+    
+    class Meta: 
+        unique_together = ("codigo", "facultad")
 
-    def __str__(self):
+    def __unicode__(self):
         return self.nombre
 
 
 class GrupoCurso(models.Model):
-    puntaje_minimo = models.IntegerField()
+    APROBACION_CHOICES = (
+        ('curso_aprobado', 'Curso aprobado'),
+        ('examen_aprobado', 'Examen Aprobado'),
+    )
+    
+    puntaje = models.IntegerField()
+    actividad = models.CharField(max_length=200, choices=APROBACION_CHOICES)
     grupo = models.ForeignKey('Grupo')
     curso = models.ForeignKey('Curso')
 

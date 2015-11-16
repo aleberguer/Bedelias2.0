@@ -11,46 +11,255 @@ carrera = Carrera.objects.all()
 for c in carrera:
 	c.delete()
 
-carreras_invalidas = []
+facultades = Facultad.objects.all()
+for f in facultades:
+	f.delete()
 
-dirname = "/Users/Alexander/Desktop/Procesados/Procesados/INGENIERIA/"
+delete_grupos = Grupo.objects.all()
+for d in delete_grupos:
+	d.delete()
 
-dirs = [d for d in os.listdir(dirname) if not(d.startswith('.'))]
+delete_grupos_curso = GrupoCurso.objects.all()
+for d in delete_grupos_curso:
+	d.delete()
 
-for di in dirs:
-	if (di != '20-51' and di != '20-9' and di != '20-93' and di != '20-95' and di != '22-3'
-		and di != '27-3'):
+baseName = "/Users/Alexander/Desktop/Procesados/Procesados/"
+
+facultades = [d for d in os.listdir(baseName) if not(d.startswith('.'))]
+for facultad in facultades:
+	dirname = baseName
+	facultad = facultad.encode('utf8')
+	# Agrego Facutad.
+	fac = Facultad()
+	fac.nombre = facultad
+	fac.save()
+
+	dirname = os.path.join(dirname, facultad);
+	carreras = [d for d in os.listdir(dirname) if not(d.startswith('.'))]
+
+	for carr in carreras:
 		carrera = Carrera()
-		carrera.codigo = di
+		carrera.codigo = carr
 		carrera.save()
 
-		files = [f for f in os.listdir(dirname + di) if f.endswith('.json')]
+		files = [f for f in os.listdir(os.path.join(dirname, carr)) if f.endswith('.json')]
 		for filename in files:
-			with open(dirname + di + "/" + filename) as json_file:
+			with open(os.path.join(dirname, carr, filename)) as json_file:
 				json_data = json.load(json_file)
-				# curso = Curso()
-				# curso.nombre = json_data['NombreMateria'].encode('utf8')
-				# curso.codigo = json_data['CodigoMateria'].encode('utf8')
-				# curso.save()
-				carrera.nombre = json_data['Carrera'].encode('utf8') 
+				curso = Curso()
+				curso.nombre = json_data['NombreMateria'].encode('utf8')
+				curso.codigo = json_data['CodigoMateria'].strip().encode('utf8')
+				curso.facultad = fac
+				carrera.nombre = json_data['Carrera'].encode('utf8')
+
+				try: 
+					with open(os.path.join(dirname, carr, "CreditosMaterias", filename)) as creditos_file:
+						creditos_data = json.load(creditos_file)
+						curso.nombre = creditos_data['Nombre'].encode('utf8')
+						curso.codigo = creditos_data['Codigo'].strip().encode('utf8')
+						if creditos_data['TipoAprobacion'].encode('utf8')  == "Examen ":
+							curso.aprobacion = 'examen'
+						else:
+							curso.aprobacion = 'curso'
+						curso.validez = creditos_data['MesesValidez'].encode('utf8')
+						curso.creditos = creditos_data['Creditos'].encode('utf8')
+				except Exception as e:
+					v = ''
+					# print "la materia no tiene creditos"
+					# print e
+
+				curso.carrera = carrera
+				curso.save()
 
 		if not carrera.nombre:		
 			carrera.delete()
 		else:
 			carrera.save()
-			files = [f for f in os.listdir(dirname + di + "/CreditosMaterias/") if f.endswith('.json')]
 			for filename in files:
-				if (filename != 'Grupo .json' and filename != 'Materia .json' and filename != 'Grupo.json' and filename != 'Materia.json'):
-					with open(dirname + di + "/CreditosMaterias/" + filename) as json_file:
-						json_data = json.load(json_file)
-						curso = Curso()
-						curso.nombre = json_data['Nombre'].encode('utf8')
-						curso.codigo = json_data['Codigo'].encode('utf8')
-						if json_data['TipoAprobacion'].encode('utf8')  == "Examen ":
-							curso.aprobacion = 'examen'
+				with open(os.path.join(dirname, carr, filename)) as previas_file:
+					json_data = json.load(previas_file)
+
+					codigo = json_data['CodigoMateria'].encode('utf8')
+					curso = Curso.objects.filter(codigo=codigo, carrera=carrera, facultad=fac)
+
+					'''
+					 *
+					 * ANTIPREVIAS 
+					 *
+					'''
+
+					'''
+					  Antiprevias de curso
+					'''
+					antiprevias_curso = json_data['Curso*']
+					
+					for key, antiprevia in antiprevias_curso.iteritems():
+						if "MateriasGrupo" in antiprevia:
+							grupo_actual = Grupo.objects.filter(codigo=antiprevia['CodigoGrupo'], facultad=fac)
+							
+							if (not grupo_actual.exists()):
+								gru = Grupo()
+								gru.codigo = antiprevia['CodigoGrupo']
+								gru.facultad = fac
+								gru.puntaje_minimo = antiprevia['PuntajeMinimo']
+								gru.puntaje_maximo = antiprevia['PuntajeMaximo']
+								gru.nombre = antiprevia['NombreGrupo']
+								gru.save()
+
+								for idx, materia in antiprevia['MateriasGrupo'].iteritems():
+									codigo_materia = materia["Materia"]
+									curso2 = Curso.objects.filter(codigo=codigo_materia, carrera=carrera, facultad=fac)
+									if curso2.exists():
+										grupo_curso = GrupoCurso()
+										grupo_curso.curso = curso2[0]
+										grupo_curso.grupo = gru
+										grupo_curso.puntaje =  materia["Puntaje"]
+										grupo_curso.actividad =  materia["Actividad"]
+										grupo_curso.save()
+
+							curso[0].antiprevias_curso_tipoGrupo.add(grupo_actual[0])
+							curso[0].save()
 						else:
-							curso.aprobacion = 'curso'
-						curso.validez = json_data['MesesValidez'].encode('utf8')
-						curso.creditos = json_data['Creditos'].encode('utf8')
-						curso.carrera = carrera
-						curso.save()
+							curso_actual = Curso.objects.filter(
+								codigo=antiprevia['CodigoMateria'], 
+								carrera=carrera, 
+								facultad=fac
+							)
+							if curso_actual.exists():
+								curso[0].antiprevias_curso_tipoCurso.add(curso_actual[0])
+								curso[0].save()
+
+					'''
+					  Antiprevias de examen
+					'''
+					antiprevias_examen = json_data['Examen*']
+					
+					for key, antiprevia in antiprevias_examen.iteritems():
+						if "MateriasGrupo" in antiprevia:
+							grupo_actual = Grupo.objects.filter(codigo=antiprevia['CodigoGrupo'], facultad=fac)
+							
+							if (not grupo_actual.exists()):
+								gru = Grupo()
+								gru.codigo = antiprevia['CodigoGrupo']
+								gru.facultad = fac
+								gru.puntaje_minimo = antiprevia['PuntajeMinimo']
+								gru.puntaje_maximo = antiprevia['PuntajeMaximo']
+								gru.nombre = antiprevia['NombreGrupo']
+								gru.save()
+
+								for idx, materia in antiprevia['MateriasGrupo'].iteritems():
+									codigo_materia = materia["Materia"]
+									curso2 = Curso.objects.filter(codigo=codigo_materia, carrera=carrera, facultad=fac)
+									if curso2.exists():
+										grupo_curso = GrupoCurso()
+										grupo_curso.curso = curso2[0]
+										grupo_curso.grupo = gru
+										grupo_curso.puntaje =  materia["Puntaje"]
+										grupo_curso.actividad =  materia["Actividad"]
+										grupo_curso.save()
+
+							curso[0].antiprevias_examen_tipoGrupo.add(grupo_actual[0])
+							curso[0].save()
+						else:
+							curso_actual = Curso.objects.filter(
+								codigo=antiprevia['CodigoMateria'], 
+								carrera=carrera, 
+								facultad=fac
+							)
+							if curso_actual.exists():
+								curso[0].antiprevias_examen_tipoCurso.add(curso_actual[0])
+								curso[0].save()
+
+					# ***********************************************************
+					# ***********************************************************
+					# ***********************************************************
+
+					'''
+					 *
+					 * PREVIAS 
+					 *
+					'''
+
+					'''
+					  Previas de curso
+					'''
+					previas_curso = json_data['Curso']
+
+					for key, previa in previas_curso.iteritems():
+						if "MateriasGrupo" in previa:
+							grupo_actual = Grupo.objects.filter(codigo=previa['CodigoGrupo'], facultad=fac)
+							
+							if (not grupo_actual.exists()):
+								gru = Grupo()
+								gru.codigo = previa['CodigoGrupo']
+								gru.facultad = fac
+								gru.puntaje_minimo = previa['PuntajeMinimo']
+								gru.puntaje_maximo = previa['PuntajeMaximo']
+								gru.nombre = previa['NombreGrupo']
+								gru.save()
+
+								for idx, materia in previa['MateriasGrupo'].iteritems():
+									codigo_materia = materia["Materia"]
+									curso2 = Curso.objects.filter(codigo=codigo_materia, carrera=carrera, facultad=fac)
+									if curso2.exists():
+										grupo_curso = GrupoCurso()
+										grupo_curso.curso = curso2[0]
+										grupo_curso.grupo = gru
+										grupo_curso.puntaje =  materia["Puntaje"]
+										grupo_curso.actividad =  materia["Actividad"]
+										grupo_curso.save()
+
+							curso[0].previas_curso_tipoGrupo.add(grupo_actual[0])
+							curso[0].save()
+						else:
+							curso_actual = Curso.objects.filter(
+								codigo=previa['CodigoMateria'], 
+								carrera=carrera, 
+								facultad=fac
+							)
+							if curso_actual.exists():
+								curso[0].previas_curso_tipoCurso.add(curso_actual[0])
+								curso[0].save()
+
+					'''
+					  Previas de examen
+					'''
+					previas_examen = json_data['Examen']
+					
+					for key, previa in previas_examen.iteritems():
+						if "MateriasGrupo" in previa:
+							grupo_actual = Grupo.objects.filter(codigo=previa['CodigoGrupo'], facultad=fac)
+							
+							if (not grupo_actual.exists()):
+								gru = Grupo()
+								gru.codigo = previa['CodigoGrupo']
+								gru.facultad = fac
+								gru.puntaje_minimo = previa['PuntajeMinimo']
+								gru.puntaje_maximo = previa['PuntajeMaximo']
+								gru.nombre = previa['NombreGrupo']
+								gru.save()
+
+								for idx, materia in previa['MateriasGrupo'].iteritems():
+									codigo_materia = materia["Materia"]
+									curso2 = Curso.objects.filter(codigo=codigo_materia, carrera=carrera, facultad=fac)
+									if curso2.exists():
+										grupo_curso = GrupoCurso()
+										grupo_curso.curso = curso2[0]
+										grupo_curso.grupo = gru
+										grupo_curso.puntaje =  materia["Puntaje"]
+										grupo_curso.actividad =  materia["Actividad"]
+										grupo_curso.save()
+
+							curso[0].previas_examen_tipoGrupo.add(grupo_actual[0])
+							curso[0].save()
+						else:
+							curso_actual = Curso.objects.filter(
+								codigo=previa['CodigoMateria'], 
+								carrera=carrera, 
+								facultad=fac
+							)
+							if curso_actual.exists():
+								curso[0].previas_examen_tipoCurso.add(curso_actual[0])
+								curso[0].save()
+	
+

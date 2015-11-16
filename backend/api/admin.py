@@ -2,9 +2,16 @@ from django.contrib import admin
 from .models import Carrera, Usuario, Curso, Grupo, GrupoCurso, UsuarioCurso, Facultad
 
 admin.site.register(Carrera)
-admin.site.register(Curso)
+
 admin.site.register(Facultad)
 
+
+class CursoAdmin(admin.ModelAdmin):
+    list_display = ('codigo', 'nombre', 'carrera', 'facultad')
+    list_display_links = ('codigo', 'nombre','carrera','facultad' )
+    list_per_page = 25
+
+admin.site.register(Curso, CursoAdmin)
 
 class GrupoCursoInline(admin.TabularInline):
     model = GrupoCurso

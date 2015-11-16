@@ -15,8 +15,9 @@ class Migration(migrations.Migration):
         migrations.CreateModel(
             name='Carrera',
             fields=[
-                ('nombre', models.CharField(max_length=200)),
-                ('codigo', models.CharField(max_length=20, serialize=False, primary_key=True)),
+                ('id', models.AutoField(verbose_name='ID', serialize=False, auto_created=True, primary_key=True)),
+                ('nombre', models.CharField(max_length=200, null=True, blank=True)),
+                ('codigo', models.CharField(max_length=20)),
                 ('plan', models.CharField(max_length=200, null=True, blank=True)),
             ],
         ),
@@ -26,12 +27,10 @@ class Migration(migrations.Migration):
                 ('id', models.AutoField(verbose_name='ID', serialize=False, auto_created=True, primary_key=True)),
                 ('codigo', models.CharField(max_length=20)),
                 ('nombre', models.CharField(max_length=200)),
-                ('aprobacion', models.CharField(max_length=200, choices=[(b'curso', b'Curso'), (b'examen', b'Examen')])),
-                ('validez', models.IntegerField()),
-                ('creditos', models.IntegerField()),
-                ('antiprevias', models.ManyToManyField(related_name='_antiprevias_+', to='api.Curso', blank=True)),
-                ('carrera', models.ForeignKey(to='api.Carrera', null=True)),
-                ('previas_curso', models.ManyToManyField(related_name='_previas_curso_+', to='api.Curso', blank=True)),
+                ('aprobacion', models.CharField(blank=True, max_length=200, null=True, choices=[(b'curso', b'Curso'), (b'examen', b'Examen')])),
+                ('validez', models.IntegerField(null=True, blank=True)),
+                ('creditos', models.IntegerField(null=True, blank=True)),
+                ('antiprevias_curso_tipoCurso', models.ManyToManyField(related_name='_antiprevias_curso_tipoCurso_+', to='api.Curso', blank=True)),
             ],
         ),
         migrations.CreateModel(
@@ -46,6 +45,7 @@ class Migration(migrations.Migration):
             fields=[
                 ('id', models.AutoField(verbose_name='ID', serialize=False, auto_created=True, primary_key=True)),
                 ('nombre', models.CharField(max_length=128)),
+                ('codigo', models.CharField(max_length=128)),
                 ('puntaje_minimo', models.IntegerField()),
                 ('puntaje_maximo', models.IntegerField()),
             ],
@@ -54,7 +54,8 @@ class Migration(migrations.Migration):
             name='GrupoCurso',
             fields=[
                 ('id', models.AutoField(verbose_name='ID', serialize=False, auto_created=True, primary_key=True)),
-                ('puntaje_minimo', models.IntegerField()),
+                ('puntaje', models.IntegerField()),
+                ('actividad', models.CharField(max_length=200, choices=[(b'curso_aprobado', b'Curso aprobado'), (b'examen_aprobado', b'Examen Aprobado')])),
                 ('curso', models.ForeignKey(to='api.Curso')),
                 ('grupo', models.ForeignKey(to='api.Grupo')),
             ],
@@ -88,20 +89,73 @@ class Migration(migrations.Migration):
         migrations.AddField(
             model_name='grupo',
             name='cursos',
-            field=models.ManyToManyField(to='api.Curso', through='api.GrupoCurso'),
+            field=models.ManyToManyField(to='api.Curso', through='api.GrupoCurso', blank=True),
+        ),
+        migrations.AddField(
+            model_name='grupo',
+            name='facultad',
+            field=models.ForeignKey(blank=True, to='api.Facultad', null=True),
         ),
         migrations.AddField(
             model_name='curso',
-            name='previas_grupo',
+            name='antiprevias_curso_tipoGrupo',
+            field=models.ManyToManyField(related_name='anti_cursos', to='api.Grupo', blank=True),
+        ),
+        migrations.AddField(
+            model_name='curso',
+            name='antiprevias_examen_tipoCurso',
+            field=models.ManyToManyField(related_name='_antiprevias_examen_tipoCurso_+', to='api.Curso', blank=True),
+        ),
+        migrations.AddField(
+            model_name='curso',
+            name='antiprevias_examen_tipoGrupo',
+            field=models.ManyToManyField(related_name='anti_examenes', to='api.Grupo', blank=True),
+        ),
+        migrations.AddField(
+            model_name='curso',
+            name='carrera',
+            field=models.ForeignKey(blank=True, to='api.Carrera', null=True),
+        ),
+        migrations.AddField(
+            model_name='curso',
+            name='facultad',
+            field=models.ForeignKey(blank=True, to='api.Facultad', null=True),
+        ),
+        migrations.AddField(
+            model_name='curso',
+            name='previas_curso_tipoCurso',
+            field=models.ManyToManyField(related_name='_previas_curso_tipoCurso_+', to='api.Curso', blank=True),
+        ),
+        migrations.AddField(
+            model_name='curso',
+            name='previas_curso_tipoGrupo',
             field=models.ManyToManyField(to='api.Grupo', blank=True),
+        ),
+        migrations.AddField(
+            model_name='curso',
+            name='previas_examen_tipoCurso',
+            field=models.ManyToManyField(related_name='_previas_examen_tipoCurso_+', to='api.Curso', blank=True),
+        ),
+        migrations.AddField(
+            model_name='curso',
+            name='previas_examen_tipoGrupo',
+            field=models.ManyToManyField(related_name='examenes_curso', to='api.Grupo', blank=True),
         ),
         migrations.AddField(
             model_name='carrera',
             name='facultad',
-            field=models.ForeignKey(related_name='carreras', to='api.Facultad', null=True),
+            field=models.ForeignKey(related_name='carreras', blank=True, to='api.Facultad', null=True),
+        ),
+        migrations.AlterUniqueTogether(
+            name='grupo',
+            unique_together=set([('codigo', 'facultad')]),
         ),
         migrations.AlterUniqueTogether(
             name='curso',
-            unique_together=set([('codigo', 'carrera')]),
+            unique_together=set([('codigo', 'carrera', 'facultad')]),
+        ),
+        migrations.AlterUniqueTogether(
+            name='carrera',
+            unique_together=set([('codigo', 'facultad')]),
         ),
     ]
