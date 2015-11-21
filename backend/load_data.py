@@ -40,6 +40,7 @@ for facultad in facultades:
 	for carr in carreras:
 		carrera = Carrera()
 		carrera.codigo = carr
+		carrera.facultad = fac
 		carrera.save()
 
 		files = [f for f in os.listdir(os.path.join(dirname, carr)) if f.endswith('.json')]

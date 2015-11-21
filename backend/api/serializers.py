@@ -1,11 +1,10 @@
 from rest_framework import serializers
 from .models import *
 
-class CarreraSerializer(serializers.Serializer):
+class CarreraSerializer(serializers.ModelSerializer):
     class Meta:
     	model = Carrera
-        fields = ('nombre')
-
+    	depth = 1
 
 class FacultadSerializer(serializers.ModelSerializer):
     class Meta:
@@ -14,3 +13,14 @@ class FacultadSerializer(serializers.ModelSerializer):
 class CursoSerializer(serializers.ModelSerializer):
     class Meta:
     	model = Curso
+
+class UserInfoSerializer(serializers.ModelSerializer):
+	class Meta:
+		model = User
+		fields = ("username", "first_name", "last_name", "email",)
+
+class UsuarioSerializer(serializers.ModelSerializer):
+	user = UserInfoSerializer()
+	class Meta:
+		model = Usuario
+		depth = 1
