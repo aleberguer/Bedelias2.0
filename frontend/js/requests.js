@@ -15,12 +15,12 @@ Requests.logout = function(parameters, successCallback, errorCallback){
 };
 
 Requests.misCursos = function(parameters, successCallback, errorCallback){
-	var url = '/usuario/' + parameters.userId + '/cursos'; 
+	var url = '/usuario/' + parameters.usuarioId + '/cursos'; 
 	Requests.ajax(url, 'GET', successCallback, errorCallback);
 };
 
 Requests.otrosCursos = function(parameters, successCallback, errorCallback){
-	var url = '/usuario/' + parameters.userId + '/otros_cursos'; 
+	var url = '/usuario/' + parameters.usuarioId + '/otros_cursos'; 
 	Requests.ajax(url, 'GET', successCallback, errorCallback);
 };
 

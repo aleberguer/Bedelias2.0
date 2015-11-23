@@ -13,13 +13,13 @@ var modalColumns = [
   { title: "Acciones" }
 ];
 
-function rowClick(){
+function rowClick(evt){
 
-  var $row = $(this).parent().parent().find('td');
+  var $columns = $(evt.currentTarget).parent().parent().find('td');
   $confirmModal = $('#confirm-course-modal');
-  $confirmModal.find('#title').text($($row[1]).text());
+  $confirmModal.find('#title').text($($columns[1]).text());
   $confirmModal.find('#content').text();
-  $confirmModal.find('#course-id').val($($row[0]).text());
+  $confirmModal.find('#course-id').val($($columns[0]).text());
 
   $('#add-course-modal').closeModal();
   $('#confirm-course-modal').openModal();
@@ -74,7 +74,7 @@ $(document).ready(function() {
           curso.codigo, 
           curso.nombre, 
           curso.creditos,
-          '<a onClick="rowClick()"> Agregar </a>'
+          '<a onClick="rowClick(event)"> Agregar </a>'
         ]);
         
       });
