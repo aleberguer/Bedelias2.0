@@ -7,6 +7,7 @@ var columns = [
 ];
 
 var modalColumns = [
+  { title: "id" },
   { title: "#" },
   { title: "Curso" },
   { title: "Creditos" },
@@ -17,7 +18,7 @@ function rowClick(evt){
 
   var $columns = $(evt.currentTarget).parent().parent().find('td');
   $confirmModal = $('#confirm-course-modal');
-  $confirmModal.find('#title').text($($columns[1]).text());
+  $confirmModal.find('#title').text($($columns[2]).text());
   $confirmModal.find('#content').text();
   $confirmModal.find('#course-id').val($($columns[0]).text());
 
@@ -61,7 +62,6 @@ $(document).ready(function() {
 
   });
 
-
   Requests.otrosCursos(parameters, function(response){
     
     var otherCourses = [];
@@ -71,6 +71,7 @@ $(document).ready(function() {
       response.forEach(function(curso) {
 
         otherCourses.push([
+          curso.id,
           curso.codigo, 
           curso.nombre, 
           curso.creditos,
@@ -81,8 +82,17 @@ $(document).ready(function() {
 
       $('#other-courses').DataTable({
         data: otherCourses,
-        columns: modalColumns
+        columns: modalColumns,
+        columnDefs: [
+            {
+                "targets": [ 0 ],
+                "className": "hidden",
+                "searchable": false
+            }
+        ]
       });
+
+      $('#confirm-course-modal').find('th').first().addClass('hidden');
 
     }
 

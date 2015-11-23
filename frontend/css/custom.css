@@ -70,3 +70,7 @@ select[name=my-courses_length] {
 .white-text {
   color: white;
 }
+
+.hidden {
+  display: none;
+}
