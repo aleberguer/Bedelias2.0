@@ -25,15 +25,49 @@ var myCourses = [
 var columns = [
   { title: "#" },
   { title: "Curso" },
-  { title: "Examen?" },
+  { title: "Tipo" },
   { title: "Creditos" },
   { title: "Eliminar" }
 ];
 
 $(document).ready(function() {
 
-  Requests.getFaculties("", function(response){
-    console.log("llegaron ya las facultades ", response);
+  var user = localStorage.getItem('user') || { userId: 1};
+
+  Requests.misCursos(user, function(response){
+    
+    alert("mis cursos success");
+    console.log("cursos", response);
+
+    var myCourses = [];
+    var data = JSON.parse(response);
+
+    if (data.results.length) {
+      data.results.forEach(function(item) {
+        console.log("-----");
+        console.info(item.curso);
+        console.log("-----");
+
+        // TODO: add checkbox
+        var salvado = (item.tipo === 'curso_aprobado') ? 'Curso Aprobado' : 'Examen Salvado';
+
+        myCourses.push([
+          item.curso.codigo, 
+          item.curso.nombre, 
+          salvado, 
+          item.curso.creditos, 
+          "Hola"
+        ]);
+        
+      });
+
+      $('#my-courses').DataTable({
+        data: myCourses,
+        columns: columns
+      });
+
+    }
+
   });
 
   var $otherCoursesTable = $('#other-courses').DataTable({
@@ -41,10 +75,6 @@ $(document).ready(function() {
     columns: columns
   });
 
-  $('#my-courses').DataTable({
-    data: myCourses,
-    columns: columns
-  });
 
   var bindRowsClick = function(){
 

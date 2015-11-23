@@ -14,6 +14,11 @@ Requests.logout = function(parameters, successCallback, errorCallback){
 	Requests.ajax('/user/logout', 'GET', successCallback, errorCallback, parameters);
 };
 
+Requests.misCursos = function(parameters, successCallback, errorCallback){
+	var url = '/usuario/' + parameters.userId + '/cursos'; 
+	Requests.ajax(url, 'GET', successCallback, errorCallback);
+};
+
 Requests.getAllCourses = function(parameters, successCallback, errorCallback){
 	Requests.ajax('/getAllCourses', 'GET', successCallback, errorCallback, parameters);
 };
