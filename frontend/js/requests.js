@@ -24,17 +24,6 @@ Requests.otrosCursos = function(parameters, successCallback, errorCallback){
 	Requests.ajax(url, 'GET', successCallback, errorCallback);
 };
 
-Requests.getAllCourses = function(parameters, successCallback, errorCallback){
-	Requests.ajax('/getAllCourses', 'GET', successCallback, errorCallback, parameters);
-};
-
-Requests.getDoableCourses = function(parameters, successCallback, errorCallback){
-	Requests.ajax('/user/getDoableCourses', 'GET', successCallback, errorCallback, parameters);
-};
-
-Requests.getFaculties = function(parameters, successCallback, errorCallback){
-	Requests.ajax('/facultades', 'GET', successCallback, errorCallback, parameters);
-};
 // +--------------+
 // | POST methods |
 // +--------------+
@@ -43,8 +32,9 @@ Requests.signup = function(parameters, successCallback, errorCallback){
 	Requests.ajax('/user/create', 'POST', successCallback, errorCallback, parameters);
 };
 
-Requests.addCourse = function(parameters, successCallback, errorCallback){
-	Requests.ajax('/user/addCourse', 'POST', successCallback, errorCallback, parameters);
+Requests.agregarCurso = function(parameters, successCallback, errorCallback){
+	var url = '/usuario/' + parameters.usuarioId + '/agregar_curso'; 
+	Requests.ajax(url, 'POST', successCallback, errorCallback, parameters);
 };
 
 // +-------------+
@@ -59,7 +49,7 @@ Requests.updateProfile = function(parameters, successCallback, errorCallback){
 // | DELETE methods |
 // +----------------+
 
-Requests.removeCourse = function(parameters, successCallback, errorCallback){
+Requests.quitarCurso = function(parameters, successCallback, errorCallback){
 	Requests.ajax('/user/removeCourse', 'DELETE', successCallback, errorCallback, parameters);
 };
 
@@ -69,9 +59,8 @@ Requests.removeCourse = function(parameters, successCallback, errorCallback){
 
 Requests.ajax = function(relativePath, type, successCallback, errorCallback, parameters){
 
-	if(!errorCallback){
-		errorCallback = Requests.defaultErrorCallback;
-	}
+	errorCallback = errorCallback || Requests.defaultErrorCallback;
+	parameters = parameters || {};
 
 	$.ajax({
 		url: Requests.HOST_URL + relativePath,
