@@ -1,0 +1,72 @@
+@font-face {
+  font-family: Mastoc;
+  src: url(../font/mastoc.ttf);
+  font-weight: 400;
+}
+
+@font-face {
+  font-family: Mohave;
+  src: url(../font/Mohave.otf);
+  font-weight: 400;
+}
+
+body {
+	/*font-family: Mohave;*/
+}
+
+h1, h2, h3, h4, h5 {
+	font-family: Mohave;
+}
+
+.text-logo {
+  font-family: Mohave;
+  text-align: center;
+  font-size: 100px;
+}
+
+.header-logo {
+  color: white;
+  font-family: Mohave;
+  font-size: 40px;
+  margin-left: 5px;
+  text-align: center;
+}
+
+.courses-modal {
+  height: 100%;
+  max-height: 90%;
+  top: 5% !important;
+}
+
+#other-courses {
+  width: 100%  !important;
+}
+
+#other-courses_wrapper {
+  margin-top: -70px;
+}
+
+#other-courses_length {
+  display: none;
+}
+
+select[name=my-courses_length] {
+  display: inline;
+  width: 60px;
+}
+
+.universities {
+  cursor: pointer;
+  margin-bottom: 20px;
+}
+
+/*sony z1*/
+
+.logo-bedelias {
+  position: relative;
+  top: -2px;
+}
+
+.white-text {
+  color: white;
+}
