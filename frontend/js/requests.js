@@ -19,6 +19,11 @@ Requests.misCursos = function(parameters, successCallback, errorCallback){
 	Requests.ajax(url, 'GET', successCallback, errorCallback);
 };
 
+Requests.otrosCursos = function(parameters, successCallback, errorCallback){
+	var url = '/usuario/' + parameters.userId + '/otros_cursos'; 
+	Requests.ajax(url, 'GET', successCallback, errorCallback);
+};
+
 Requests.getAllCourses = function(parameters, successCallback, errorCallback){
 	Requests.ajax('/getAllCourses', 'GET', successCallback, errorCallback, parameters);
 };

@@ -1,34 +1,17 @@
-var otherCourses = [
-    [ "1022", "Webir", "Si", "10", "2011/04/25"],
-    [ "1120", "Algebra lineal 1", "No", "9", "2011/07/25"],
-    [ "1022", "Webir", "Si", "10", "2011/04/25"],
-    [ "1120", "Algebra lineal 1", "No", "9", "2011/07/25"],
-    [ "1022", "Webir", "Si", "10", "2011/04/25"],
-    [ "1120", "Algebra lineal 1", "No", "9", "2011/07/25"],
-    [ "1022", "Webir", "Si", "10", "2011/04/25"],
-    [ "1120", "Algebra lineal 1", "No", "9", "2011/07/25"],
-    [ "1234", "Calculo 2", "Si", "16", "2009/01/12"]
-];
-
-var myCourses = [
-    [ "1022", "Webir", "Si", "10", "2011/04/25"],
-    [ "1120", "Algebra lineal 1", "No", "9", "2011/07/25"],
-    [ "1022", "Webir", "Si", "10", "2011/04/25"],
-    [ "1120", "Algebra lineal 1", "No", "9", "2011/07/25"],
-    [ "1022", "Webir", "Si", "10", "2011/04/25"],
-    [ "1120", "Algebra lineal 1", "No", "9", "2011/07/25"],
-    [ "1022", "Webir", "Si", "10", "2011/04/25"],
-    [ "1120", "Algebra lineal 1", "No", "9", "2011/07/25"],
-    [ "1234", "Calculo 2", "Si", "16", "2009/01/12"]
-];
-
 var columns = [
   { title: "#" },
   { title: "Curso" },
   { title: "Tipo" },
   { title: "Creditos" },
-  { title: "Eliminar" }
+  { title: "Acciones" }
 ];
+
+var modal_columns = [
+  { title: "#" },
+  { title: "Curso" },
+  { title: "Creditos" }
+];
+
 
 $(document).ready(function() {
 
@@ -36,17 +19,10 @@ $(document).ready(function() {
 
   Requests.misCursos(user, function(response){
     
-    alert("mis cursos success");
-    console.log("cursos", response);
-
     var myCourses = [];
-    var data = JSON.parse(response);
 
-    if (data.results.length) {
-      data.results.forEach(function(item) {
-        console.log("-----");
-        console.info(item.curso);
-        console.log("-----");
+    if (response.results.length) {
+      response.results.forEach(function(item) {
 
         // TODO: add checkbox
         var salvado = (item.tipo === 'curso_aprobado') ? 'Curso Aprobado' : 'Examen Salvado';
@@ -56,7 +32,7 @@ $(document).ready(function() {
           item.curso.nombre, 
           salvado, 
           item.curso.creditos, 
-          "Hola"
+          "<a href='#'> Editar </a> <a href='#'> Borrar </a>"
         ]);
         
       });
@@ -70,11 +46,34 @@ $(document).ready(function() {
 
   });
 
-  var $otherCoursesTable = $('#other-courses').DataTable({
-    data: otherCourses,
-    columns: columns
-  });
 
+  Requests.otrosCursos(user, function(response){
+    
+    var otherCourses = [];
+
+    if (response.length) {
+      response.forEach(function(curso) {
+
+        otherCourses.push([
+          curso.codigo, 
+          curso.nombre, 
+          curso.creditos
+        ]);
+        
+      });
+      var $otherCoursesTable = $('#other-courses').DataTable({
+        data: otherCourses,
+        columns: modal_columns
+      });
+
+      bindRowsClick();
+      $otherCoursesTable.on('draw.dt', function() {
+          bindRowsClick();
+      });
+
+    }
+
+  });
 
   var bindRowsClick = function(){
 
@@ -122,13 +121,6 @@ $(document).ready(function() {
   // Cancel course modal button click
   $('#cancel-course-btn').click(function(){
     $('#add-course-modal').openModal();
-  });
-
-  bindRowsClick();
-  $otherCoursesTable.on('draw.dt', function() {
-
-    bindRowsClick();
-
   });
 
 });

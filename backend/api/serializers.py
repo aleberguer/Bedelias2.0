@@ -14,6 +14,11 @@ class CursoSerializer(serializers.ModelSerializer):
     class Meta:
     	model = Curso
 
+class UsuarioCursoSerializer(serializers.ModelSerializer):
+    class Meta:
+    	model = UsuarioCurso
+    	depth = 1
+
 class UserInfoSerializer(serializers.ModelSerializer):
 	class Meta:
 		model = User

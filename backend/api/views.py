@@ -35,13 +35,53 @@ class CursoViewSet(viewsets.ModelViewSet):
     queryset = Curso.objects.all()
     serializer_class = CursoSerializer
 
-class UsuarioViewSet(mixins.CreateModelMixin, 
-                   mixins.RetrieveModelMixin, 
-                   mixins.UpdateModelMixin,
-                   mixins.DestroyModelMixin,
-                   viewsets.GenericViewSet):
+class UsuarioViewSet(viewsets.ModelViewSet):
     queryset = Usuario.objects.all()
     serializer_class = UsuarioSerializer
+
+    @detail_route()
+    def cursos(self, request, pk=None):
+        cursos = UsuarioCurso.objects.filter(usuario=self.get_object())
+
+        page = self.paginate_queryset(cursos)
+        if page is not None:
+            serializer = UsuarioCursoSerializer(page, many=True)
+            return self.get_paginated_response(serializer.data)
+
+        serializer = self.get_serializer(cursos, many=True)
+        return Response(serializer.data)
+
+    @detail_route()
+    def otros_cursos(self, request, pk=None):
+        user = self.get_object()
+        mis_cursos = UsuarioCurso.objects.filter(usuario=user)
+
+        result = []
+        for c in mis_cursos:
+            result.append(c.id)
+
+        cursos_carrera = Curso.objects.filter(carrera=user.carrera)
+        cursos_carrera = cursos_carrera.exclude(id__in=result)
+
+        # page = self.paginate_queryset(cursos_carrera)
+        # if page is not None:
+        #     serializer = CursoSerializer(page, many=True)
+        #     return self.get_paginated_response(serializer.data)
+
+        serializer = CursoSerializer(cursos_carrera, many=True)
+        return Response(serializer.data)
+
+    @detail_route()
+    def creditos(self, request, pk=None):
+        cursos = UsuarioCurso.objects.filter(usuario=self.get_object())
+        suma = 0
+        for c in cursos:
+            if (c.tipo == 'curso_aprobado' and c.curso.aprobacion == 'curso') or (c.tipo == 'examen_aprobado'):
+                if c.curso.creditos is not None:
+                    suma += c.curso.creditos
+
+        return Response(suma)
+
 
 '''
 create user
@@ -50,10 +90,13 @@ create user
 def create_user(request):
     print request.body
     data = json.loads(request.body.decode("utf-8"))
-    user = User()
-    user.first_name = data["fullname"]
-    user.username = data["username"]
-    user.email = data["email"]
-    user.password =make_password(data["password"])
-    user.save()
-    return HttpResponse(json.dumps(data), status=200)
+    if not User.objects.filter(username=data["username"]).exists():
+        user = User()
+        user.first_name = data["fullname"]
+        user.username = data["username"]
+        user.email = data["email"]
+        user.password =make_password(data["password"])
+        user.save()
+        return HttpResponse(json.dumps(data), status=200)
+    else:
+        return HttpResponse("Ya existe un usuario con ese username", status=400)
