@@ -83,6 +83,36 @@ class UsuarioViewSet(viewsets.ModelViewSet):
         return Response(suma)
 
 
+    @detail_route(methods=['POST'])
+    def agregar_curso(self, request, pk=None):
+        data = json.loads(request.body.decode("utf-8"))
+        newLink = UsuarioCurso()
+
+        newLink.usuario = Usuario.objects.get(id=data['usuarioId'])
+        newLink.curso = Curso.objects.get(id=data['cursoId'])
+        newLink.tipo = data['tipo']
+        
+        try:
+            newLink.save()
+            return HttpResponse("Curso ingresado con exito")
+        except Exception, e:
+            return HttpResponse(e)
+    
+
+    @detail_route(methods=['POST'])
+    def borrar_curso(self, request, pk=None):
+        data = json.loads(request.body.decode("utf-8"))
+        link = UsuarioCurso.objects.get(usuario__id=data['usuarioId'], curso__id=data['cursoId'] )
+
+        try:
+            link.delete()
+            return HttpResponse("Curso borrado con exito")
+        except Exception, e:
+            return HttpResponse(e)
+        
+
+
+
 '''
 create user
 '''
