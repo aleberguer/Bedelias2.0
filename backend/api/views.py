@@ -63,11 +63,6 @@ class UsuarioViewSet(viewsets.ModelViewSet):
         cursos_carrera = Curso.objects.filter(carrera=user.carrera)
         cursos_carrera = cursos_carrera.exclude(id__in=result)
 
-        # page = self.paginate_queryset(cursos_carrera)
-        # if page is not None:
-        #     serializer = CursoSerializer(page, many=True)
-        #     return self.get_paginated_response(serializer.data)
-
         serializer = CursoSerializer(cursos_carrera, many=True)
         return Response(serializer.data)
 
@@ -91,13 +86,13 @@ class UsuarioViewSet(viewsets.ModelViewSet):
         newLink.usuario = Usuario.objects.get(id=data['usuarioId'])
         newLink.curso = Curso.objects.get(id=data['cursoId'])
         newLink.tipo = data['tipo']
-        
+
         try:
             newLink.save()
-            return HttpResponse("Curso ingresado con exito")
+            return HttpResponse(json.dumps({ "status": 200, "message": "Curso ingresado con exito" }))
         except Exception, e:
             return HttpResponse(e)
-    
+
 
     @detail_route(methods=['POST'])
     def borrar_curso(self, request, pk=None):
@@ -106,10 +101,10 @@ class UsuarioViewSet(viewsets.ModelViewSet):
 
         try:
             link.delete()
-            return HttpResponse("Curso borrado con exito")
+            return HttpResponse(json.dumps({ "status": 200, "message": "Curso borrado con exito" }))
         except Exception, e:
             return HttpResponse(e)
-        
+
 
 
 
