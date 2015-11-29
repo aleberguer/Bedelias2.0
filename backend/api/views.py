@@ -130,6 +130,10 @@ def create_user(request):
         user.username = data["username"]
         user.email = data["email"]
         user.password =make_password(data["password"])
+        print(data["carrera"]["facultad"])
+        dataCarrera = data["carrera"]
+        carrera = Carrera.objects.filter(codigo=dataCarrera["codigo"], facultad=dataCarrera["facultad"])
+        user.carrera = carrera
         user.save()
         return HttpResponse(json.dumps(data), status=200)
     else:

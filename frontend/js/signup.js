@@ -84,7 +84,7 @@ var carreraId;
 
       var carrera = {};
       carrera.facultad = facultad; 
-      carrera.plan = carreraId;
+      carrera.codigo = carreraId;
 
       var parameters = {};
       parameters.carrera = carrera;
