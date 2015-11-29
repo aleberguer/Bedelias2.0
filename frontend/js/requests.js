@@ -29,6 +29,11 @@ Requests.otrosCursos = function(parameters, successCallback, errorCallback){
 	Requests.ajax(url, 'GET', successCallback, errorCallback);
 };
 
+Requests.carreras = function(parameters, successCallback, errorCallback){
+	var url = '/facultades/' + parameters.id + '/carreras'; 
+	Requests.ajax(url, 'GET', successCallback, errorCallback);
+};
+
 // +--------------+
 // | POST methods |
 // +--------------+

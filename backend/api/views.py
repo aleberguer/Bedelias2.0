@@ -31,6 +31,15 @@ class FacultadViewSet(viewsets.ModelViewSet):
     queryset = Facultad.objects.all()
     serializer_class = FacultadSerializer
 
+    @detail_route()
+    def carreras(self, request, pk=None):
+        print(str(self.get_object()))
+        carreras = Carrera.objects.filter(facultad=self.get_object())
+
+        print(str(carreras))
+        serializer = CarreraSerializer(carreras, many=True)
+        return Response(serializer.data)
+
 class CursoViewSet(viewsets.ModelViewSet):
     queryset = Curso.objects.all()
     serializer_class = CursoSerializer
