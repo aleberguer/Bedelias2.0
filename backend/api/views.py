@@ -61,6 +61,61 @@ class UsuarioViewSet(viewsets.ModelViewSet):
         return Response(serializer.data)
 
     @detail_route()
+    def posibles_cursos(self, request, pk=None):
+        user = self.get_object()
+        mis_cursos = UsuarioCurso.objects.filter(usuario=user)
+
+        result = []
+        for c in mis_cursos:
+            result.append(c.id)
+
+        cursos_carrera = Curso.objects.filter(carrera=user.carrera)
+        cursos_carrera = cursos_carrera.exclude(id__in=result)
+
+        serializer = CursoSerializer(cursos_carrera, many=True)
+        return Response(serializer.data)
+
+        # PSEUDOCODIGO
+        # ------------
+        # materiasACursar = []
+        # materiasCarrera = materiasCarrera - usuario.cursos
+        # For materia in materiasCarrera
+            # puedoCursar = true
+            # index = 0
+            # while puedoCursar && index < materia.previasCurso.length
+                # previa = materia.previasCurso[index]
+                # if previa not in usuario.cursos #cursos salvados por el usuario
+                    # puedoCursar = false
+                # else
+                    # index++
+            # index = 0;
+            # while puedoCursar && index < materia.antipreviasCurso.length
+                # antiPrevia = materia.antipreviasCurso[index]
+                # if antiPrevia in usuario.cursos
+                    # puedoCursar = false
+                # else
+                    # index++
+            # index = 0;
+            # while puedoCursar &&  index < materia.previasGrupo.length
+                # grupo = materia.previasGrupo[index]
+                # puntaje = getPuntajeUsuarioGrupo(usuario,grupo) # devuelve el puntaje en el grupo para el usuario
+                # if  puntaje < grupo.puntajeMin || puntaje > grupo.puntajeMax
+                    # puedoCursar = false
+                # else
+                    # index++
+            # index = 0;
+            # while puedoCursar && index < materia.antipreviasGrupo.length
+                # grupo = materia.antipreviasGrupo[index]
+                # puntaje = getPuntajeUsuarioGrupo(usuario,grupo)
+                # if  puntaje >= grupo.puntajeMin && puntaje <= grupo.puntajeMax
+                    # puedoCursar = false
+                # else
+                    # index++
+
+            # if puedoCursar
+                # materiasACursar.add(materia)
+
+    @detail_route()
     def otros_cursos(self, request, pk=None):
         user = self.get_object()
         mis_cursos = UsuarioCurso.objects.filter(usuario=user)
@@ -99,6 +154,19 @@ class UsuarioViewSet(viewsets.ModelViewSet):
         try:
             newLink.save()
             return HttpResponse(json.dumps({ "status": 200, "message": "Curso ingresado con exito" }))
+        except Exception, e:
+            return HttpResponse(e)
+
+    @detail_route(methods=['POST'])
+    def editar_curso(self, request, pk=None):
+        data = json.loads(request.body.decode("utf-8"))
+        link = UsuarioCurso.objects.get(usuario__id=data['usuarioId'], curso__id=data['cursoId'] )
+
+        link.tipo = data['tipo']
+
+        try:
+            link.save()
+            return HttpResponse(json.dumps({ "status": 200, "message": "Curso modificado con exito" }))
         except Exception, e:
             return HttpResponse(e)
 

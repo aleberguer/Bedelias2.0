@@ -29,8 +29,13 @@ Requests.otrosCursos = function(parameters, successCallback, errorCallback){
 	Requests.ajax(url, 'GET', successCallback, errorCallback);
 };
 
+Requests.otrosCursos = function(parameters, successCallback, errorCallback){
+	var url = '/usuario/' + parameters.usuarioId + '/posibles_cursos';
+	Requests.ajax(url, 'GET', successCallback, errorCallback);
+};
+
 Requests.carreras = function(parameters, successCallback, errorCallback){
-	var url = '/facultades/' + parameters.id + '/carreras'; 
+	var url = '/facultades/' + parameters.id + '/carreras';
 	Requests.ajax(url, 'GET', successCallback, errorCallback);
 };
 
@@ -44,6 +49,11 @@ Requests.signup = function(parameters, successCallback, errorCallback){
 
 Requests.agregarCurso = function(parameters, successCallback, errorCallback){
 	var url = '/usuario/' + parameters.usuarioId + '/agregar_curso/';
+	Requests.ajax(url, 'POST', successCallback, errorCallback, parameters);
+};
+
+Requests.editarCurso = function(parameters, successCallback, errorCallback){
+	var url = '/usuario/' + parameters.usuarioId + '/editar_curso/';
 	Requests.ajax(url, 'POST', successCallback, errorCallback, parameters);
 };
 

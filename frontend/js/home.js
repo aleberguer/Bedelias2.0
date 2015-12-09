@@ -75,19 +75,20 @@ function editarCurso(cursoId, cursoNombre, cursoTipo) {
     $editModal.find('#checkbox-examen-edit').attr('checked','false');
   }
 
-  // $editModal.find('#confirm-edit-btn').click(function() {
+  $editModal.find('#confirm-edit-btn').click(function() {
 
-  //  var parameters = {};
-  //  parameters.usuarioId = user.id;
-  //  parameters.cursoId = $('#edit-course-modal #course-id').val();
-  //  parameters.tipo = $('#edit-course-modal #checkbox-examen:checked').length ? 'examen_aprobado' : 'curso_aprobado';
+    var parameters = {};
+    parameters.usuarioId = user.id;
+    parameters.cursoId = $('#edit-course-modal #course-id').val();
+    parameters.tipo = $('#edit-course-modal #checkbox-examen-edit:checked').length ? 'examen_aprobado' : 'curso_aprobado';
 
-  //  Requests.editarCurso(parameters, function(response){
-  //    Materialize.toast('Se ha editado el curso correctamente.', 4000);
-  //    cargarDatosUsuario(true);
-  //  });
+    Requests.editarCurso(parameters, function(response){
+      Materialize.toast('Se ha editado el curso correctamente.', 4000);
+      cargarDatosUsuario(true);
+      $editModal.find('#confirm-edit-btn').off();
+    });
 
-  //});
+  });
 
 }
 
