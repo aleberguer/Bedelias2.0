@@ -33,7 +33,7 @@ Requests.signup = function(parameters, successCallback, errorCallback){
 };
 
 Requests.agregarCurso = function(parameters, successCallback, errorCallback){
-	var url = '/usuario/' + parameters.usuarioId + '/agregar_curso'; 
+	var url = '/usuario/' + parameters.usuarioId + '/agregar_curso/'; 
 	Requests.ajax(url, 'POST', successCallback, errorCallback, parameters);
 };
 
