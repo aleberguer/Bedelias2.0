@@ -1,10 +1,14 @@
 $(document).ready(function(){
 
 	var successCallback = function(response){
-		console.info('STATUS 200 ok');
-		console.info(response);
 
-		window.location.href = './home.html';
+    localStorage.setItem('user', JSON.stringify(response));
+    window.location.href = './home.html';
+
+	}
+
+	var errorCallback = function(response) {
+		Materialize.toast('Usuario/password incorrectos.', 4000);
 	}
 
 	$('#login-button-submit').click(function(){
@@ -13,11 +17,7 @@ $(document).ready(function(){
 		parameters.username = $('#username').val();
 		parameters.password = $('#password').val();
 
-		console.info(parameters);
-
-		return successCallback();
-
-		Requests.login(parameters, successCallback);
+		Requests.login(parameters, successCallback, errorCallback);
 
 	});
 

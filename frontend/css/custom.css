@@ -60,17 +60,18 @@ select[name=my-courses_length] {
   margin-bottom: 20px;
 }
 
-.uni_logo { 
+.uni_logo {
     filter: grayscale(100%);
     -webkit-filter: grayscale(100%);
     filter: gray;
     -webkit-transition: all .3s ease;
 }
 
-.uni_logo:hover { 
+.uni_logo:hover {
     filter: grayscale(0%);
     -webkit-filter: grayscale(0%);
     filter: none;
+    text-shadow: 1px 1px 6px #47b465;
 }
 
 .logo-bedelias {
@@ -92,6 +93,16 @@ select[name=my-courses_length] {
   font-size: 70px;
 }
 
-td a {
+td a, #logout {
   cursor: pointer;
+}
+
+.container2 {
+  margin-bottom: 5%;
+  margin-left: 5%;
+  width: 90%;
+}
+
+.hidden-text {
+  color: #47b465;
 }

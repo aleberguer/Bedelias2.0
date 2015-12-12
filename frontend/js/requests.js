@@ -6,10 +6,6 @@ Requests.HOST_URL = 'http://0.0.0.0:8000/api';
 // | GET methods |
 // +-------------+
 
-Requests.login = function(parameters, successCallback, errorCallback){
-	Requests.ajax('/user/login', 'GET', successCallback, errorCallback, parameters);
-};
-
 Requests.logout = function(parameters, successCallback, errorCallback){
 	Requests.ajax('/user/logout', 'GET', successCallback, errorCallback, parameters);
 };
@@ -42,6 +38,10 @@ Requests.carreras = function(parameters, successCallback, errorCallback){
 // +--------------+
 // | POST methods |
 // +--------------+
+
+Requests.login = function(parameters, successCallback, errorCallback){
+	Requests.ajax('/user/login', 'POST', successCallback, errorCallback, parameters);
+};
 
 Requests.signup = function(parameters, successCallback, errorCallback){
 	Requests.ajax('/user/create', 'POST', successCallback, errorCallback, parameters);

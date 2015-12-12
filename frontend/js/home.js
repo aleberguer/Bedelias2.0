@@ -22,7 +22,9 @@ var modalColumns = [
   { title: "Acciones" }
 ];
 
-var user = localStorage.getItem('user') || { id: 1, nombre: 'Diego Perez' };
+var user = JSON.parse(localStorage.getItem('user')) || { id: 1, user: { username: "ruso", first_name: "Diego", last_name: "Perez", email: "diego@diego.com"} };
+
+$('#user-name').text('Hola, ' + user.user.first_name);
 
 /*===========================================
   Event handlers
@@ -39,6 +41,13 @@ function rowClick(evt){
   $('#confirm-course-modal').openModal();
 
 }
+
+$('#logout').click(function() {
+
+  localStorage.removeItem('user');
+  window.location.href = './index.html';
+
+});
 
 function borrarCurso(cursoId, cursoNombre) {
 

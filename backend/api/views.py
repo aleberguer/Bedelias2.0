@@ -8,7 +8,9 @@ from django.views.decorators.csrf import csrf_exempt
 from django.http import HttpResponse
 from .models import *
 from .serializers import *
+from django.contrib.auth import authenticate, login
 from django.contrib.auth.hashers import make_password
+
 
 class CarreraViewSet(viewsets.ModelViewSet):
     queryset = Carrera.objects.all()
@@ -190,19 +192,42 @@ create user
 '''
 @csrf_exempt
 def create_user(request):
-    print request.body
     data = json.loads(request.body.decode("utf-8"))
     if not User.objects.filter(username=data["username"]).exists():
         user = User()
         user.first_name = data["fullname"]
         user.username = data["username"]
         user.email = data["email"]
-        user.password =make_password(data["password"])
-        print(data["carrera"]["facultad"])
-        dataCarrera = data["carrera"]
-        carrera = Carrera.objects.filter(codigo=dataCarrera["codigo"], facultad=dataCarrera["facultad"])
-        user.carrera = carrera
+        user.password = make_password(data["password"])
         user.save()
-        return HttpResponse(json.dumps(data), status=200)
+
+        usuario = Usuario.objects.get(user=user)
+
+        dataCarrera = data["carrera"]
+        carrera = Carrera.objects.filter(codigo=dataCarrera["codigo"], facultad=dataCarrera["facultad"])[0]
+        usuario.carrera = carrera
+        usuario.save()
+
+        serializer = UsuarioSerializer(usuario)
+
+        return HttpResponse(json.dumps(serializer.data), status=200)
     else:
         return HttpResponse("Ya existe un usuario con ese username", status=400)
+
+'''
+login user
+'''
+@csrf_exempt
+def login_user(request):
+    data = json.loads(request.body.decode("utf-8"))
+    user = authenticate(username=data["username"], password=data["password"])
+
+    if user:
+        if user.is_active:
+            login(request, user)
+            usuario = Usuario.objects.get(user=user)
+            serializer = UsuarioSerializer(usuario)
+            return HttpResponse(json.dumps(serializer.data), status=200)
+        else:
+            return HttpResponse("Your Rango account is disabled.")
+

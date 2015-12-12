@@ -17,11 +17,12 @@ from django.conf.urls import include, url
 from django.contrib import admin
 from api import urls as api_urls
 from rest_framework import routers
-from api.views import create_user
+from api.views import create_user, login_user
 
 urlpatterns = [
     url(r'^admin/', include(admin.site.urls)),
     url(r'^grappelli/', include('grappelli.urls')),
     url(r'^api/', include(api_urls)),
     url(r'^api/user/create$', create_user, name="create_user"),
+    url(r'^api/user/login$', login_user, name="login_user"),
 ]
