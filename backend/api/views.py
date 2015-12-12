@@ -149,7 +149,7 @@ class UsuarioViewSet(viewsets.ModelViewSet):
         data = json.loads(request.body.decode("utf-8"))
         newLink = UsuarioCurso()
 
-        newLink.usuario = Usuario.objects.get(id=data['usuarioId'])
+        newLink.usuario = Usuario.objects.get(id=pk)
         newLink.curso = Curso.objects.get(id=data['cursoId'])
         newLink.tipo = data['tipo']
 
@@ -176,7 +176,7 @@ class UsuarioViewSet(viewsets.ModelViewSet):
     @detail_route(methods=['POST'])
     def borrar_curso(self, request, pk=None):
         data = json.loads(request.body.decode("utf-8"))
-        link = UsuarioCurso.objects.get(usuario__id=data['usuarioId'], curso__id=data['cursoId'] )
+        link = UsuarioCurso.objects.get(usuario__id=pk, curso__id=data['cursoId'] )
 
         try:
             link.delete()
@@ -185,6 +185,17 @@ class UsuarioViewSet(viewsets.ModelViewSet):
             return HttpResponse(e)
 
 
+    @detail_route(methods=['POST'])
+    def modificar_curso(self, request, pk=None):
+        data = json.loads(request.body.decode("utf-8"))
+        link = UsuarioCurso.objects.get(usuario__id=pk, curso__id=data['cursoId'] )
+
+        try:
+            link.tipo = data['estado']
+            link.save()
+            return HttpResponse(json.dumps({ 'status':200, 'message': 'Curso modificado con exito'}))
+        except Exception, e:
+            return HttpResponse(e)
 
 
 '''

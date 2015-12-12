@@ -43,14 +43,14 @@ class Curso(models.Model):
     validez = models.IntegerField(null=True, blank=True)
     creditos = models.IntegerField(null=True, blank=True)
     previas_curso_tipoGrupo = models.ManyToManyField('Grupo', blank=True)
-    previas_curso_tipoCurso = models.ManyToManyField('self', blank=True)
+    previas_curso_tipoCurso = models.ManyToManyField('self', blank=True, symmetrical = False)
     antiprevias_curso_tipoGrupo = models.ManyToManyField('Grupo', blank=True, related_name="anti_cursos")
-    antiprevias_curso_tipoCurso = models.ManyToManyField('self', blank=True)
+    antiprevias_curso_tipoCurso = models.ManyToManyField('self', blank=True, symmetrical = False, related_name="anti_cursos_curso")
 
     previas_examen_tipoGrupo = models.ManyToManyField('Grupo', blank=True, related_name="examenes_curso")
-    previas_examen_tipoCurso = models.ManyToManyField('self', blank=True, related_name="examenes_grupo")
+    previas_examen_tipoCurso = models.ManyToManyField('self', blank=True, related_name="examenes_grupo", symmetrical = False)
     antiprevias_examen_tipoGrupo = models.ManyToManyField('Grupo', blank=True, related_name="anti_examenes")
-    antiprevias_examen_tipoCurso = models.ManyToManyField('self', blank=True)
+    antiprevias_examen_tipoCurso = models.ManyToManyField('self', blank=True, symmetrical= False, related_name="anti_examenes_curso")
 
     carrera = models.ForeignKey('Carrera', null=True, blank=True)
     facultad = models.ForeignKey('Facultad', null=True, blank=True)
