@@ -88,6 +88,9 @@ class GrupoCurso(models.Model):
     grupo = models.ForeignKey('Grupo')
     curso = models.ForeignKey('Curso')
 
+    def __unicode__(self):
+        return self.curso.nombre +' - '+self.grupo.nombre
+
 
 class UsuarioCurso(models.Model):
     APROBACION_CHOICES = (
@@ -97,7 +100,6 @@ class UsuarioCurso(models.Model):
     tipo = models.CharField(max_length=200, choices=APROBACION_CHOICES)
     usuario = models.ForeignKey('Usuario')
     curso = models.ForeignKey('Curso')
-
 
 
 @receiver(post_save, sender=User)

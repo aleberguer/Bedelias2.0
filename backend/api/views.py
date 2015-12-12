@@ -67,53 +67,105 @@ class UsuarioViewSet(viewsets.ModelViewSet):
 
         result = []
         for c in mis_cursos:
-            result.append(c.id)
+            result.append(c.curso.id)
 
         cursos_carrera = Curso.objects.filter(carrera=user.carrera)
         cursos_carrera = cursos_carrera.exclude(id__in=result)
 
-        serializer = CursoSerializer(cursos_carrera, many=True)
+        cursos_aprobados = []
+
+        for c in mis_cursos:
+            cursos_aprobados.append(c.curso.codigo)
+        
+        examenesa = UsuarioCurso.objects.filter(usuario=user, tipo="examen_aprobado")
+        examenes_aprobados = []
+        for c in examenesa:
+            examenes_aprobados.append(c.curso.codigo)
+
+        
+
+        materiasACursar = []
+
+        for curso in cursos_carrera:
+            puedoCursar = True
+            
+            index = 0
+            previas_tipoCurso = curso.previas_curso_tipoCurso.all()
+            while puedoCursar and index < previas_tipoCurso.count():
+                prev =  previas_tipoCurso[index]
+
+                if prev.aprobacion == u'Curso' and (prev.codigo not in cursos_aprobados):
+                    puedoCursar=False
+                elif prev.aprobacion == u'Examen' and (prev.codigo not in examenes_aprobados):
+                    puedoCursar=False
+                else:    
+                    index += 1
+
+            index = 0
+            antiprevias_tipoCurso = curso.antiprevias_curso_tipoCurso.all()
+            while puedoCursar and index < antiprevias_tipoCurso.count():
+                prev =  antiprevias_tipoCurso[index]
+
+                if prev.aprobacion == u'Curso' and (prev.codigo in cursos_aprobados):
+                    puedoCursar=False
+                elif prev.aprobacion == u'Examen' and (prev.codigo in examenes_aprobados):
+                    puedoCursar=False
+                else:    
+                    index += 1
+
+            index = 0
+            previas_tipoGrupo = curso.previas_curso_tipoGrupo.all()
+            while puedoCursar and index < previas_tipoGrupo.count():
+                prev = previas_tipoGrupo[index]
+
+                #########################################################
+                puntaje = 0
+                for materia_grupo in prev.cursos.all():
+
+                    grcu = GrupoCurso.objects.filter(grupo=prev, curso=materia_grupo)
+                    if grcu.exists():
+                        for gc in grcu:
+                            if gc.actividad == u'Curso aprobado' and (gc.curso.codigo in cursos_aprobados):
+                                puntaje += gc.puntaje 
+                            elif gc.actividad == u'Examen aprobado' and (gc.curso.codigo in examenes_aprobados):
+                                puntaje += gc.puntaje 
+                    
+                #########################################################
+               
+                if  puntaje < prev.puntaje_minimo or puntaje > prev.puntaje_maximo:
+                    puedoCursar = False
+                else:
+                    index +=1
+
+            index = 0
+            antiprevias_tipoGrupo = curso.antiprevias_curso_tipoGrupo.all()
+            while puedoCursar and index < antiprevias_tipoGrupo.count():
+                prev = antiprevias_tipoGrupo[index]
+
+                #########################################################
+                puntaje = 0
+                for materia_grupo in prev.cursos.all():
+
+                    grcu = GrupoCurso.objects.filter(grupo=prev, curso=materia_grupo)
+                    if grcu.exists():
+                        for gc in grcu:
+                            if gc.actividad == u'Curso aprobado' and (gc.curso.codigo in cursos_aprobados):
+                                puntaje += gc.puntaje 
+                            elif gc.actividad == u'Examen aprobado' and (gc.curso.codigo in examenes_aprobados):
+                                puntaje += gc.puntaje 
+                #########################################################
+               
+                if  puntaje >= prev.puntaje_minimo and puntaje <= prev.puntaje_maximo:
+                    puedoCursar = False
+                else:
+                    index +=1
+
+            
+            if puedoCursar:
+                materiasACursar.append(curso)
+                
+        serializer = CursoSerializer(materiasACursar, many=True)
         return Response(serializer.data)
-
-        # PSEUDOCODIGO
-        # ------------
-        # materiasACursar = []
-        # materiasCarrera = materiasCarrera - usuario.cursos
-        # For materia in materiasCarrera
-            # puedoCursar = true
-            # index = 0
-            # while puedoCursar && index < materia.previasCurso.length
-                # previa = materia.previasCurso[index]
-                # if previa not in usuario.cursos #cursos salvados por el usuario
-                    # puedoCursar = false
-                # else
-                    # index++
-            # index = 0;
-            # while puedoCursar && index < materia.antipreviasCurso.length
-                # antiPrevia = materia.antipreviasCurso[index]
-                # if antiPrevia in usuario.cursos
-                    # puedoCursar = false
-                # else
-                    # index++
-            # index = 0;
-            # while puedoCursar &&  index < materia.previasGrupo.length
-                # grupo = materia.previasGrupo[index]
-                # puntaje = getPuntajeUsuarioGrupo(usuario,grupo) # devuelve el puntaje en el grupo para el usuario
-                # if  puntaje < grupo.puntajeMin || puntaje > grupo.puntajeMax
-                    # puedoCursar = false
-                # else
-                    # index++
-            # index = 0;
-            # while puedoCursar && index < materia.antipreviasGrupo.length
-                # grupo = materia.antipreviasGrupo[index]
-                # puntaje = getPuntajeUsuarioGrupo(usuario,grupo)
-                # if  puntaje >= grupo.puntajeMin && puntaje <= grupo.puntajeMax
-                    # puedoCursar = false
-                # else
-                    # index++
-
-            # if puedoCursar
-                # materiasACursar.add(materia)
 
     @detail_route()
     def otros_cursos(self, request, pk=None):
@@ -122,7 +174,7 @@ class UsuarioViewSet(viewsets.ModelViewSet):
 
         result = []
         for c in mis_cursos:
-            result.append(c.id)
+            result.append(c.curso.id)
 
         cursos_carrera = Curso.objects.filter(carrera=user.carrera)
         cursos_carrera = cursos_carrera.exclude(id__in=result)
