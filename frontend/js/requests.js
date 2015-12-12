@@ -15,12 +15,27 @@ Requests.logout = function(parameters, successCallback, errorCallback){
 };
 
 Requests.misCursos = function(parameters, successCallback, errorCallback){
-	var url = '/usuario/' + parameters.usuarioId + '/cursos'; 
+	var url = '/usuario/' + parameters.usuarioId + '/cursos';
+	Requests.ajax(url, 'GET', successCallback, errorCallback);
+};
+
+Requests.misCreditos = function(parameters, successCallback, errorCallback){
+	var url = '/usuario/' + parameters.usuarioId + '/creditos';
 	Requests.ajax(url, 'GET', successCallback, errorCallback);
 };
 
 Requests.otrosCursos = function(parameters, successCallback, errorCallback){
-	var url = '/usuario/' + parameters.usuarioId + '/otros_cursos'; 
+	var url = '/usuario/' + parameters.usuarioId + '/otros_cursos';
+	Requests.ajax(url, 'GET', successCallback, errorCallback);
+};
+
+Requests.otrosCursos = function(parameters, successCallback, errorCallback){
+	var url = '/usuario/' + parameters.usuarioId + '/posibles_cursos';
+	Requests.ajax(url, 'GET', successCallback, errorCallback);
+};
+
+Requests.carreras = function(parameters, successCallback, errorCallback){
+	var url = '/facultades/' + parameters.id + '/carreras';
 	Requests.ajax(url, 'GET', successCallback, errorCallback);
 };
 
@@ -33,7 +48,17 @@ Requests.signup = function(parameters, successCallback, errorCallback){
 };
 
 Requests.agregarCurso = function(parameters, successCallback, errorCallback){
-	var url = '/usuario/' + parameters.usuarioId + '/agregar_curso/'; 
+	var url = '/usuario/' + parameters.usuarioId + '/agregar_curso/';
+	Requests.ajax(url, 'POST', successCallback, errorCallback, parameters);
+};
+
+Requests.editarCurso = function(parameters, successCallback, errorCallback){
+	var url = '/usuario/' + parameters.usuarioId + '/editar_curso/';
+	Requests.ajax(url, 'POST', successCallback, errorCallback, parameters);
+};
+
+Requests.borrarCurso = function(parameters, successCallback, errorCallback){
+	var url = '/usuario/' + parameters.usuarioId + '/borrar_curso/';
 	Requests.ajax(url, 'POST', successCallback, errorCallback, parameters);
 };
 
@@ -45,17 +70,9 @@ Requests.updateProfile = function(parameters, successCallback, errorCallback){
 	Requests.ajax('/user/update', 'PUT', successCallback, errorCallback, parameters);
 };
 
-// +----------------+
-// | DELETE methods |
-// +----------------+
-
-Requests.quitarCurso = function(parameters, successCallback, errorCallback){
-	Requests.ajax('/user/removeCourse', 'DELETE', successCallback, errorCallback, parameters);
-};
-
-// +----------------+
-// | DELETE methods |
-// +----------------+
+// +-------------+
+// | AUX methods |
+// +-------------+
 
 Requests.ajax = function(relativePath, type, successCallback, errorCallback, parameters){
 
@@ -77,4 +94,5 @@ Requests.defaultErrorCallback = function(result){
 	console.error('+---------------+');
 	console.error('| EXPLOTO (o.O) |');
 	console.error('+---------------+');
+	console.log(result);
 };
