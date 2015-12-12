@@ -36,21 +36,30 @@ var carreraId;
     });
   });
 
+  var tabla;
+
   var carrerasCallback = function(response){
     console.info('Carreras callback 200 OK');
     console.info(response);
+
     var carreras = [];
 
     if (response.length) {
+
+      if (tabla) {
+        tabla.destroy();
+      }
+
       response.forEach(function(item) {
 
         carreras.push([
-          item.codigo, 
+          item.codigo,
           item.nombre
         ]);
+
       });
 
-      $('#carreras').DataTable({
+      tabla = $('#carreras').DataTable({
         data: carreras,
         columns: columns,
         "ajax": "scripts/ids-arrays.php",
@@ -83,7 +92,7 @@ var carreraId;
     if($('#password').val() == $('#password2').val()){
 
       var carrera = {};
-      carrera.facultad = facultad; 
+      carrera.facultad = facultad;
       carrera.codigo = carreraId;
 
       var parameters = {};
@@ -93,22 +102,20 @@ var carreraId;
       parameters.username = $('#username').val();
       parameters.password = $('#password').val();
 
-      alert(JSON.stringify(parameters));
+      Requests.signup(parameters, successCallback, function(error){
+        console.log(error);
+      });
 
-
-    Requests.signup(parameters, successCallback, function(error){
-      console.log(error);
-    });
     } else {
       Materialize.toast('Las contrase&ntilde;as no coinciden', 4000);
     }
   });
 
   var successCallback = function(response){
-    console.info('STATUS 200 ok');
-    console.info(response);
 
+    localStorage.setItem('user', JSON.stringify(response));
     window.location.href = './home.html';
+
   }
 
 });
