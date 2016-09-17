@@ -1,0 +1,74 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+	 <meta http-equiv="Content-Type" content="text/html; charset=UTF-8"/>
+        <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1.0, user-scalable=no"/>
+        <title>Bedelias</title>
+        <!-- CSS  -->
+        <link href="https://fonts.googleapis.com/icon?family=Material+Icons" rel="stylesheet">
+        <link href="css/materialize.css" type="text/css" rel="stylesheet" media="screen,projection"/>
+        <link href="css/style.css" type="text/css" rel="stylesheet" media="screen,projection"/>
+        <link href="css/custom.css" type="text/css" rel="stylesheet" media="screen,projection"/>
+        <link href="css/jquery.dataTables.min.css" type="text/css" rel="stylesheet" media="screen,projection"/>
+        <link rel="icon" type="image/ico" href="images/favicon.ico" />
+</head>
+<body>
+	<nav role="navigation white-text">
+        <div class="nav-wrapper container">
+            <img src="images/LogoUdelar.png" alt="udelar" class="logo-bedelias">
+            <a id="logo-container" href="#" class="header-logo">Bedelias 2.0</a>
+            <ul class="right hide-on-med-and-down">
+                <li><a id="logout" class="white-text">Cerrar Sesión</a></li>
+            </ul>
+            <ul class="right hide-on-med-and-down">
+                <li id="user-name"></li>
+            </ul>
+            <ul id="nav-mobile" class="side-nav">
+                <li><a href="#">Cerrar Sesión</a></li>
+            </ul>
+            <a href="#" data-activates="nav-mobile" class="button-collapse"><i class="material-icons">menu</i></a>
+        </div>
+    </nav>
+	<div class="container">
+		<table id="results" class="display cursos-posibles"></table>
+	</div>
+	<footer class="page-footer teal">
+            <div class="container">
+                <div class="row">
+                    <div class="col l6 s12">
+                        <h5 class="white-text">Webir 2015</h5>
+                        <p class="grey-text text-lighten-4">Somos un equipo de estudiantes universitarios trabajando en este proyecto con el objetivo de ayudar a otros estudiantes. Apreciamos su soporte y ayuda.</p>
+                    </div>
+                    <div class="col l3 s12">
+                        <h5 class="white-text">Integrantes</h5>
+                        <ul>
+                            <li><a class="white-text" href="#!">Alexander Berguer</a></li>
+                            <li><a class="white-text" href="#!">Pablo Guartes</a></li>
+                            <li><a class="white-text" href="#!">Gonzalo Melgar</a></li>
+                            <li><a class="white-text" href="#!">Mauricio Piñatares</a></li>
+                            <li><a class="hidden-text">Diego Perez</a></li>
+                        </ul>
+                    </div>
+                    <div class="col l3 s12 offset-s3">
+                        <h5 class="white-text">Información obtenida publicamente desde</h5>
+                        <ul>
+                            <li><a class="white-text" target="_blank" href="http://www.bedelias.edu.uy">Bedelias.edu.uy</a></li>
+                        </ul>
+                    </div>
+                </div>
+            </div>
+            <div class="footer-copyright">
+                <div class="container">
+                    Made by <a class="brown-text text-lighten-3" href="http://materializecss.com">Materialize</a>
+                </div>
+            </div>
+        </footer>
+
+	<!--  Scripts -->
+	<script src="https://code.jquery.com/jquery-2.1.1.min.js"></script>
+	<script src="js/materialize.js"></script>
+	<script src="js/jquery.dataTables.min.js"></script>
+	<script src="js/requests.js"></script>
+	<script src="js/posibles-cursos.js"></script>
+</body>
+</html>

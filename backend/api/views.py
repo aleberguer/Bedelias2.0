@@ -46,6 +46,13 @@ class CursoViewSet(viewsets.ModelViewSet):
     queryset = Curso.objects.all()
     serializer_class = CursoSerializer
 
+    def get_queryset(self):
+        queryset = Curso.objects.all()
+        query = self.request.query_params.get('q', None)
+        if query is not None:
+            queryset = queryset.filter(nombre__icontains=query, carrera__codigo='72-0')
+        return queryset
+
 class UsuarioViewSet(viewsets.ModelViewSet):
     queryset = Usuario.objects.all()
     serializer_class = UsuarioSerializer
@@ -96,9 +103,11 @@ class UsuarioViewSet(viewsets.ModelViewSet):
             while puedoCursar and index < previas_tipoCurso.count():
                 prev =  previas_tipoCurso[index]
 
-                if prev.aprobacion == u'Curso' and (prev.codigo not in cursos_aprobados):
+                print (prev.aprobacion)
+
+                if prev.aprobacion == 'curso' and (prev.codigo not in cursos_aprobados):
                     puedoCursar=False
-                elif prev.aprobacion == u'Examen' and (prev.codigo not in examenes_aprobados):
+                elif prev.aprobacion == 'examen' and (prev.codigo not in examenes_aprobados):
                     puedoCursar=False
                 else:    
                     index += 1
@@ -108,9 +117,9 @@ class UsuarioViewSet(viewsets.ModelViewSet):
             while puedoCursar and index < antiprevias_tipoCurso.count():
                 prev =  antiprevias_tipoCurso[index]
 
-                if prev.aprobacion == u'Curso' and (prev.codigo in cursos_aprobados):
+                if prev.aprobacion == 'curso' and (prev.codigo in cursos_aprobados):
                     puedoCursar=False
-                elif prev.aprobacion == u'Examen' and (prev.codigo in examenes_aprobados):
+                elif prev.aprobacion == 'examen' and (prev.codigo in examenes_aprobados):
                     puedoCursar=False
                 else:    
                     index += 1

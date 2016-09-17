@@ -25,7 +25,7 @@ Requests.otrosCursos = function(parameters, successCallback, errorCallback){
 	Requests.ajax(url, 'GET', successCallback, errorCallback);
 };
 
-Requests.otrosCursos = function(parameters, successCallback, errorCallback){
+Requests.posiblesCursos = function(parameters, successCallback, errorCallback){
 	var url = '/usuario/' + parameters.usuarioId + '/posibles_cursos';
 	Requests.ajax(url, 'GET', successCallback, errorCallback);
 };

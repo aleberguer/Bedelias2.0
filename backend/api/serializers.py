@@ -13,6 +13,7 @@ class FacultadSerializer(serializers.ModelSerializer):
 class CursoSerializer(serializers.ModelSerializer):
     class Meta:
     	model = Curso
+        depth = 1
 
 class UsuarioCursoSerializer(serializers.ModelSerializer):
     class Meta:

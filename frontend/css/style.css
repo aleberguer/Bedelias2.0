@@ -55,3 +55,8 @@ p {
 footer.page-footer {
   margin: 0;
 }
+
+.cursos-posibles {
+  width: 100%;
+  min-height: 500px;
+}
